@@ -22,10 +22,13 @@ interface DataTableProps {
       description: string
       isActive: boolean
     }[]
+    handleDelete: (id: string) => void
+    handleUpdate: (id: string) => void
   }
 }
 
 const DataTable: React.FC<DataTableProps> = ({ content }) => {
+  const { handleDelete, handleUpdate } = content
   return (
     <React.Fragment>
       <TableContainer component={Paper} className={styles.tableContainer}>
