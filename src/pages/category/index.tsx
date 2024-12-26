@@ -1,5 +1,6 @@
 import HamburgerMenu from '@/components/menu/hamburguer-menu'
 import links from '@/components/menu/hamburguer-menu-content'
+import DataTable from '@/components/table/data-table'
 import { Category, NewCategory } from '@/types/category'
 import { CategoryReview, UnknownResponse } from '@/types/response'
 import {
@@ -19,22 +20,14 @@ import {
   DialogTitle,
   Divider,
   FormLabel,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   TextField,
 } from '@mui/material'
 import { AxiosResponse } from 'axios'
 import Head from 'next/head'
 import React, { useEffect, useState } from 'react'
+import styles from './index.module.css'
 
 const CategoriaList: React.FC = () => {
-  // const router = useRouter()
-
   const [categories, setCategories] = useState<Category[]>([])
   const [newCategory, setNewCategory] = useState<NewCategory>({
     description: '',
@@ -174,23 +167,25 @@ const CategoriaList: React.FC = () => {
     listUpdate()
   }
 
+  const content = {
+    header: [
+      { title: 'Description', size: 85 },
+      { title: 'Status', size: 15 },
+    ],
+    data: filteredCategories.map((category) => ({
+      id: category.id,
+      description: category.description,
+      isActive: category.isActive,
+    })),
+    handleDelete,
+    handleUpdate,
+  }
+
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'stretch',
-      }}
-    >
+    <div className={styles.container}>
       {/* <Navbar /> */}
       <HamburgerMenu links={links} />
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'flex-start',
-        }}
-      ></div>
+      <div className={styles.menu}></div>
       <div>
         <Head>
           <title>Categories</title>
@@ -200,105 +195,31 @@ const CategoriaList: React.FC = () => {
           variant="outlined"
           margin="normal"
           size="small"
-          sx={{ width: '300px' }}
+          className={styles.searchField}
           value={searchTerm}
           onChange={handleSearch}
         />
         <Divider />
         <form onSubmit={handleCreate}>
-          <div
-            style={{
-              display: 'flex',
-              gap: '10px',
-              marginTop: '20px',
-              marginBottom: '10px',
-              height: '80px',
-              flexDirection: 'row',
-              alignItems: 'flex-start',
-            }}
-          >
+          <div className={styles.form}>
             <TextField
               label="New Category"
               variant="outlined"
               size="small"
-              sx={{ width: '300px' }}
+              className={styles.searchField}
               value={newCategory.description}
               onChange={(e) =>
                 setNewCategory({ ...newCategory, description: e.target.value })
               }
               error={!!insertErrors.description}
               helperText={insertErrors.description}
-              style={{ marginRight: '10px' }}
             />
             <Button variant="contained" color="primary" type="submit">
               Create
             </Button>
           </div>
         </form>
-        <TableContainer component={Paper} style={{ marginTop: '10px' }}>
-          <Table>
-            {/* Cabeçalho da tabela */}
-            <TableHead>
-              <TableRow>
-                <TableCell style={{ fontWeight: 'bold', width: '50%' }}>
-                  Description
-                </TableCell>
-                <TableCell style={{ fontWeight: 'bold', width: '25%' }}>
-                  Status
-                </TableCell>
-                <TableCell
-                  style={{
-                    fontWeight: 'bold',
-                    width: '15%',
-                    minWidth: '180px',
-                  }}
-                >
-                  Actions
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            {/* Corpo da tabela */}
-            <TableBody>
-              {filteredCategories
-                .sort((a, b) =>
-                  a.description.localeCompare(b.description, undefined, {
-                    numeric: true,
-                  }),
-                )
-                .map((category, index) => (
-                  <TableRow
-                    key={category.id}
-                    style={{
-                      backgroundColor: index % 2 == 0 ? '#F8F8FF' : '#FFFFFF',
-                    }}
-                  >
-                    <TableCell>{category.description}</TableCell>
-                    <TableCell>
-                      {category.isActive ? 'Active' : 'Inactive'}
-                    </TableCell>
-                    <TableCell>
-                      {/* Botões para editar e excluir */}
-                      <Button
-                        style={{ marginRight: '10px' }}
-                        variant="contained"
-                        color="primary"
-                        onClick={() => handleUpdate(category.id)}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="contained"
-                        color="error"
-                        onClick={() => handleDelete(category.id)}
-                      >
-                        Delete
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <DataTable content={content} />
         {/* Dialog to delete a category */}
         <Dialog
           open={deleteOpenDialog}
@@ -334,33 +255,15 @@ const CategoriaList: React.FC = () => {
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
-          <DialogTitle
-            style={{
-              color: '#333333',
-              backgroundColor: '#F8F8FF',
-              borderBottomColor: '#C0C0C0',
-              borderBottomWidth: '1px',
-              borderBottomStyle: 'solid',
-              marginBottom: '20px',
-            }}
-            id="alert-dialog-title"
-          >
+          <DialogTitle className={styles.dialogTitle} id="alert-dialog-title">
             {'Edit Category'}
           </DialogTitle>
           <DialogContent>
-            {/* <Divider style={{ marginBottom: '20px' }} /> */}
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                gap: '10px',
-                alignItems: 'center',
-              }}
-            >
-              <FormLabel style={{ display: 'flex', alignItems: 'center' }}>
+            <div className={styles.form}>
+              <FormLabel className={styles.formLabel}>
                 Description:
                 <TextField
-                  style={{ marginLeft: '10px' }}
+                  className={styles.formLabelTextField}
                   type="text"
                   size="small"
                   value={putCategory.description}
