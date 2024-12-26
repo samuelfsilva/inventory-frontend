@@ -1,12 +1,15 @@
 import HamburgerMenu from '@/components/menu/hamburguer-menu'
 import links from '@/components/menu/hamburguer-menu-content'
+import DataTable from '@/components/table/data-table'
+import { Batch, NewBatch } from '@/types/batch'
+import { BatchReview, UnknownResponse } from '@/types/response'
 import {
-  createCategory,
-  deleteCategory,
-  getCategories,
-  getCategory,
-  updateCategory,
-} from '@/utils/category'
+  createBatch,
+  deleteBatch,
+  getBatch,
+  getBatches,
+  updateBatch,
+} from '@/utils/batch'
 import {
   Button,
   Checkbox,
@@ -17,87 +20,57 @@ import {
   DialogTitle,
   Divider,
   FormLabel,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   TextField,
 } from '@mui/material'
 import { AxiosResponse } from 'axios'
 import Head from 'next/head'
 import React, { useEffect, useState } from 'react'
+import styles from './index.module.css'
 
-interface Category {
-  id: string
-  description: string
-  isActive: boolean
-}
-
-interface NewCategory {
-  description: string
-  isActive: boolean
-}
-
-interface UnknownResponse {
-  error: {
-    [key: string]: string
-  }
-}
-
-interface Review {
-  description?: string
-  isActive?: boolean
-}
-
-const CategoriaList: React.FC = () => {
-  // const router = useRouter()
-
-  const [categories, setCategories] = useState<Category[]>([])
-  const [newCategory, setNewCategory] = useState<NewCategory>({
+const BatchList: React.FC = () => {
+  const [batches, setBatches] = useState<Batch[]>([])
+  const [newBatch, setNewBatch] = useState<NewBatch>({
     description: '',
-    isActive: true,
+    expirationDate: new Date(),
   })
-  const [putCategory, setPutCategory] = useState<NewCategory>({
+  const [putBatch, setPutBatch] = useState<NewBatch>({
     description: '',
-    isActive: true,
+    expirationDate: new Date(),
   })
   const [searchTerm, setSearchTerm] = useState('')
-  const [insertErrors, setInsertErrors] = useState<Review>({})
-  const [editErrors, setEditErrors] = useState<Review>({})
+  const [insertErrors, setInsertErrors] = useState<BatchReview>({})
+  const [editErrors, setEditErrors] = useState<BatchReview>({})
   const [deleteOpenDialog, setDeleteOpenDialog] = useState(false)
   const [editOpenDialog, setEditOpenDialog] = useState(false)
   const [deleteId, setDeleteId] = useState('')
   const [editId, setEditId] = useState('')
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchBatches = async () => {
       listUpdate()
     }
 
-    fetchCategories()
+    fetchBatches()
   }, [searchTerm])
 
   const listUpdate = async () => {
-    const response = await getCategories()
-    setCategories([])
-    setCategories(
-      response.filter((category) =>
-        category.description.toLowerCase().includes(searchTerm.toLowerCase()),
+    const response = await getBatches()
+    setBatches([])
+    setBatches(
+      response.filter((batch) =>
+        batch.description.toLowerCase().includes(searchTerm.toLowerCase()),
       ),
     )
   }
 
   const handleCreate = async (event: React.FormEvent) => {
     event.preventDefault()
-    const response = (await createCategory(newCategory)) as AxiosResponse<
-      Category | UnknownResponse
+    const response = (await createBatch(newBatch)) as AxiosResponse<
+      Batch | UnknownResponse
     >
     if (response.status !== 200) {
       const { error } = (await response.data) as UnknownResponse as {
-        error: Review
+        error: BatchReview
       }
 
       if (error) {
@@ -107,7 +80,7 @@ const CategoriaList: React.FC = () => {
       }
     }
 
-    setNewCategory({ description: '', isActive: true })
+    setNewBatch({ description: '', expirationDate: new Date() })
     listUpdate()
   }
 
@@ -115,10 +88,10 @@ const CategoriaList: React.FC = () => {
     setEditId(id)
     setEditOpenDialog(true)
 
-    const data = await getCategory(id as string)
-    setPutCategory({
+    const data = await getBatch(id as string)
+    setPutBatch({
       description: data.description,
-      isActive: data.isActive,
+      expirationDate: data.expirationDate,
     })
   }
 
@@ -131,8 +104,8 @@ const CategoriaList: React.FC = () => {
     setSearchTerm(event.target.value)
   }
 
-  const filteredCategories = categories.filter((category) =>
-    category.description.toLowerCase().includes(searchTerm.toLowerCase()),
+  const filteredBatches = batches.filter((batch) =>
+    batch.description.toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
   const handleCloseDeleteDialog = () => {
@@ -141,7 +114,7 @@ const CategoriaList: React.FC = () => {
 
   const handleCloseEditDialog = () => {
     setEditId('')
-    setNewCategory({ description: '', isActive: true })
+    setNewBatch({ description: '', expirationDate: new Date() })
     setEditErrors({})
     setEditOpenDialog(false)
   }
@@ -151,13 +124,13 @@ const CategoriaList: React.FC = () => {
 
     handleCloseDeleteDialog()
 
-    const response = (await deleteCategory(deleteId)) as AxiosResponse<
-      Category | UnknownResponse
+    const response = (await deleteBatch(deleteId)) as AxiosResponse<
+      Batch | UnknownResponse
     >
     if (response.status === 204) {
-      alert('Category deleted successfully')
+      alert('Batch deleted successfully')
     } else {
-      alert('Error deleting category, please try again')
+      alert('Error deleting batch, please try again')
     }
     setDeleteId('')
 
@@ -168,14 +141,14 @@ const CategoriaList: React.FC = () => {
     event.preventDefault()
     handleCloseEditDialog()
 
-    const response = (await updateCategory(
+    const response = (await updateBatch(
       editId as string,
-      putCategory as NewCategory,
-    )) as AxiosResponse<Category | UnknownResponse>
+      putBatch as NewBatch,
+    )) as AxiosResponse<Batch | UnknownResponse>
 
     if (response.status !== 200) {
       const { error } = (await response.data) as UnknownResponse as {
-        error: Review
+        error: BatchReview
       }
 
       if (error) {
@@ -194,132 +167,60 @@ const CategoriaList: React.FC = () => {
     listUpdate()
   }
 
+  const content = {
+    header: [
+      { title: 'Description', size: 85 },
+      { title: 'Expiration Date', size: 15 },
+    ],
+    data: filteredBatches.map((batch) => ({
+      id: batch.id,
+      description: batch.description,
+      expirationDate: batch.expirationDate,
+    })),
+    handleDelete,
+    handleUpdate,
+  }
+
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'stretch',
-      }}
-    >
+    <div className={styles.container}>
       {/* <Navbar /> */}
       <HamburgerMenu links={links} />
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'flex-start',
-        }}
-      ></div>
+      <div className={styles.menu}></div>
       <div>
         <Head>
-          <title>Batch</title>
+          <title>Batches</title>
         </Head>
         <TextField
-          label="Search Category"
+          label="Search Batch"
           variant="outlined"
           margin="normal"
           size="small"
-          sx={{ width: '300px' }}
+          className={styles.searchField}
           value={searchTerm}
           onChange={handleSearch}
         />
         <Divider />
         <form onSubmit={handleCreate}>
-          <div
-            style={{
-              display: 'flex',
-              gap: '10px',
-              marginTop: '20px',
-              marginBottom: '10px',
-              height: '80px',
-              flexDirection: 'row',
-              alignItems: 'flex-start',
-            }}
-          >
+          <div className={styles.form}>
             <TextField
-              label="New Category"
+              label="New Batch"
               variant="outlined"
               size="small"
-              sx={{ width: '300px' }}
-              value={newCategory.description}
+              className={styles.searchField}
+              value={newBatch.description}
               onChange={(e) =>
-                setNewCategory({ ...newCategory, description: e.target.value })
+                setNewBatch({ ...newBatch, description: e.target.value })
               }
               error={!!insertErrors.description}
               helperText={insertErrors.description}
-              style={{ marginRight: '10px' }}
             />
             <Button variant="contained" color="primary" type="submit">
               Create
             </Button>
           </div>
         </form>
-        <TableContainer component={Paper} style={{ marginTop: '10px' }}>
-          <Table>
-            {/* Cabeçalho da tabela */}
-            <TableHead>
-              <TableRow>
-                <TableCell style={{ fontWeight: 'bold', width: '50%' }}>
-                  Description
-                </TableCell>
-                <TableCell style={{ fontWeight: 'bold', width: '25%' }}>
-                  Status
-                </TableCell>
-                <TableCell
-                  style={{
-                    fontWeight: 'bold',
-                    width: '15%',
-                    minWidth: '180px',
-                  }}
-                >
-                  Actions
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            {/* Corpo da tabela */}
-            <TableBody>
-              {filteredCategories
-                .sort((a, b) =>
-                  a.description.localeCompare(b.description, undefined, {
-                    numeric: true,
-                  }),
-                )
-                .map((category, index) => (
-                  <TableRow
-                    key={category.id}
-                    style={{
-                      backgroundColor: index % 2 == 0 ? '#F8F8FF' : '#FFFFFF',
-                    }}
-                  >
-                    <TableCell>{category.description}</TableCell>
-                    <TableCell>
-                      {category.isActive ? 'Active' : 'Inactive'}
-                    </TableCell>
-                    <TableCell>
-                      {/* Botões para editar e excluir */}
-                      <Button
-                        style={{ marginRight: '10px' }}
-                        variant="contained"
-                        color="primary"
-                        onClick={() => handleUpdate(category.id)}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="contained"
-                        color="error"
-                        onClick={() => handleDelete(category.id)}
-                      >
-                        Delete
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        {/* Dialog to delete a category */}
+        <DataTable content={content} />
+        {/* Dialog to delete a batch */}
         <Dialog
           open={deleteOpenDialog}
           onClose={handleCloseDeleteDialog}
@@ -327,7 +228,7 @@ const CategoriaList: React.FC = () => {
           aria-describedby="alert-dialog-description"
         >
           <DialogTitle id="alert-dialog-title">
-            {'Are you sure you want to delete the category?'}
+            {'Are you sure you want to delete the batch?'}
           </DialogTitle>
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
@@ -347,46 +248,28 @@ const CategoriaList: React.FC = () => {
             </Button>
           </DialogActions>
         </Dialog>
-        {/* Dialog to edit a category */}
+        {/* Dialog to edit a batch */}
         <Dialog
           open={editOpenDialog}
           onClose={handleCloseEditDialog}
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
-          <DialogTitle
-            style={{
-              color: '#333333',
-              backgroundColor: '#F8F8FF',
-              borderBottomColor: '#C0C0C0',
-              borderBottomWidth: '1px',
-              borderBottomStyle: 'solid',
-              marginBottom: '20px',
-            }}
-            id="alert-dialog-title"
-          >
-            {'Edit Category'}
+          <DialogTitle className={styles.dialogTitle} id="alert-dialog-title">
+            {'Edit Batch'}
           </DialogTitle>
           <DialogContent>
-            {/* <Divider style={{ marginBottom: '20px' }} /> */}
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                gap: '10px',
-                alignItems: 'center',
-              }}
-            >
-              <FormLabel style={{ display: 'flex', alignItems: 'center' }}>
+            <div className={styles.form}>
+              <FormLabel className={styles.formLabel}>
                 Description:
                 <TextField
-                  style={{ marginLeft: '10px' }}
+                  className={styles.formLabelTextField}
                   type="text"
                   size="small"
-                  value={putCategory.description}
+                  value={putBatch.description}
                   onChange={(e) =>
-                    setPutCategory({
-                      ...putCategory,
+                    setPutBatch({
+                      ...putBatch,
                       description: e.target.value,
                     })
                   }
@@ -397,11 +280,11 @@ const CategoriaList: React.FC = () => {
               <FormLabel>
                 Active:
                 <Checkbox
-                  checked={putCategory.isActive}
+                  checked={putBatch.expirationDate}
                   onChange={(e) =>
-                    setPutCategory({
-                      ...putCategory,
-                      isActive: e.target.checked,
+                    setPutBatch({
+                      ...putBatch,
+                      expirationDate: e.target.checked,
                     })
                   }
                 />
@@ -422,4 +305,4 @@ const CategoriaList: React.FC = () => {
   )
 }
 
-export default CategoriaList
+export default BatchList
