@@ -12,6 +12,7 @@ import {
   getCategory,
   updateCategory,
 } from '@/utils/category'
+import WarningAmberIcon from '@mui/icons-material/WarningAmber'
 import {
   Checkbox,
   DialogContent,
@@ -174,7 +175,8 @@ const CategoriaList: React.FC = () => {
           handleCloseDialog={handleCloseDeleteDialog}
           handleConfirm={handleConfirmDelete}
         >
-          <DialogContent>
+          <DialogContent className={styles.dialogContent}>
+            <WarningAmberIcon className={styles.dialogIcon} />
             <DialogContentText>This action cannot be undone</DialogContentText>
           </DialogContent>
         </DialogWindow>

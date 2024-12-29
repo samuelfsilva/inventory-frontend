@@ -1,7 +1,6 @@
-import { Category, NewCategory } from '@/types/category'
-import { CategoryReview, UnknownResponse } from '@/types/response'
+import { NewCategory } from '@/types/category'
+import { CategoryResponse, CategoryReview } from '@/types/response'
 import { createCategory } from '@/utils/category'
-import { AxiosResponse } from 'axios'
 import React, { useState } from 'react'
 import DefaultPrimaryButton from '../default-primary-button'
 import TextInput from '../text-input'
@@ -18,29 +17,24 @@ const CategoryCreationForm: React.FC<CategoryCreationFormProps> = ({
     description: '',
     isActive: true,
   })
-  const [insertErrors, setInsertErrors] = useState<CategoryReview>({})
+  const [errors, setErrors] = useState<CategoryReview>({})
   const handleCreate = async (event: React.FormEvent) => {
     event.preventDefault()
-    const response = (await createCategory(newCategory)) as AxiosResponse<
-      Category | UnknownResponse
-    >
+    const response = await createCategory(newCategory)
+
     if (response.status !== 200) {
-      const { error } = (await response.data) as UnknownResponse as {
-        error: CategoryReview
-      }
+      const { error } = response.data as CategoryResponse
 
       if (error) {
-        setInsertErrors(error)
+        setErrors(error)
       } else {
-        setInsertErrors({})
+        setErrors({})
       }
     }
 
     setNewCategory({ description: '', isActive: true })
 
-    if (handleUpdate) {
-      handleUpdate()
-    }
+    handleUpdate?.()
   }
   return (
     <form onSubmit={handleCreate}>
@@ -51,8 +45,8 @@ const CategoryCreationForm: React.FC<CategoryCreationFormProps> = ({
           onChange={(e) =>
             setNewCategory({ ...newCategory, description: e.target.value })
           }
-          error={!!insertErrors.description}
-          helperText={insertErrors.description}
+          error={!!errors.description}
+          helperText={errors.description}
         />
         <DefaultPrimaryButton text="Create" type="submit" />
       </div>
