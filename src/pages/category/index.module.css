@@ -10,34 +10,6 @@
   justify-content: flex-start;
 }
 
-.searchField {
-  width: 300px;
-}
-
-.form {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-  margin-bottom: 10px;
-  height: 40px;
-  flex-direction: row;
-  align-items: flex-start;
-}
-
-.newCategoryField {
-  width: 300px;
-  margin-right: 10px;
-}
-
-.dialogTitle {
-  color: #333333;
-  background-color: #f8f8ff;
-  border-bottom-color: #c0c0c0;
-  border-bottom-width: 1px;
-  border-bottom-style: solid;
-  margin-bottom: 20px;
-}
-
 .dialogContent {
   display: flex;
   flex-direction: row;
