@@ -6,5 +6,14 @@ export interface Batch {
 
 export interface NewBatch {
   description: string
-  expirationDate: Date
+  expirationDate: Date | null
+}
+
+export interface BatchReview {
+  description?: string
+  expirationDate?: string
+}
+
+export interface BatchResponse {
+  error: BatchReview
 }
