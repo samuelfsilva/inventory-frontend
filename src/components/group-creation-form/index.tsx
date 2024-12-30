@@ -1,34 +1,33 @@
-import { CategoryResponse, CategoryReview, NewCategory } from '@/types/category'
-import { createCategory } from '@/utils/category'
+import { GroupResponse, GroupReview, NewGroup } from '@/types/group'
+import { createGroup } from '@/utils/group'
 import React, { useState } from 'react'
 import DefaultPrimaryButton from '../default-primary-button'
 import TextInput from '../text-input'
 import styles from './index.module.css'
 
-interface CategoryCreationFormProps {
+interface GroupCreationFormProps {
   handleUpdate?: () => void
 }
 
-const CategoryCreationForm: React.FC<CategoryCreationFormProps> = ({
+const GroupCreationForm: React.FC<GroupCreationFormProps> = ({
   handleUpdate,
 }) => {
-  const [newCategory, setNewCategory] = useState<NewCategory>({
+  const [newGroup, setNewGroup] = useState<NewGroup>({
     description: '',
-    isActive: true,
   })
-  const [errors, setErrors] = useState<CategoryReview>({})
+  const [errors, setErrors] = useState<GroupReview>({})
   const handleCreate = async (event: React.FormEvent) => {
     event.preventDefault()
-    const response = await createCategory(newCategory)
+    const response = await createGroup(newGroup)
 
     if (response.status !== 200) {
-      const { error } = response.data as CategoryResponse
+      const { error } = response.data as GroupResponse
 
       if (error) {
         setErrors(error)
       } else {
         setErrors({})
-        setNewCategory({ description: '', isActive: true })
+        setNewGroup({ description: '' })
         handleUpdate?.()
       }
     }
@@ -37,10 +36,10 @@ const CategoryCreationForm: React.FC<CategoryCreationFormProps> = ({
     <form onSubmit={handleCreate}>
       <div className={styles.form}>
         <TextInput
-          label="New Category"
-          value={newCategory.description}
+          label="New Group"
+          value={newGroup.description}
           onChange={(e) =>
-            setNewCategory({ ...newCategory, description: e.target.value })
+            setNewGroup({ ...newGroup, description: e.target.value })
           }
           error={!!errors.description}
           helperText={errors.description}
@@ -53,4 +52,4 @@ const CategoryCreationForm: React.FC<CategoryCreationFormProps> = ({
   )
 }
 
-export default CategoryCreationForm
+export default GroupCreationForm
