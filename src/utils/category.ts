@@ -1,5 +1,5 @@
-import { Category, NewCategory } from '@/types/category'
-import { CategoryResponse, UnknownResponse } from '@/types/response'
+import { Category, CategoryResponse, NewCategory } from '@/types/category'
+import { UnknownResponse } from '@/types/response'
 import axios, { AxiosError } from 'axios'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL
@@ -26,22 +26,27 @@ export const createCategory = async (
   }
 }
 
-export const updateCategory = async (id: string, category: NewCategory) => {
+export const updateCategory = async (
+  id: string,
+  category: NewCategory,
+): Promise<axios.AxiosResponse<Category | CategoryResponse>> => {
   try {
     const response = await axios.put(`${API_URL}/category/${id}`, category)
     return response
   } catch (error) {
     const axiosError = error as AxiosError<UnknownResponse>
-    return axiosError.response
+    return axiosError?.response as unknown as axios.AxiosResponse<CategoryResponse>
   }
 }
 
-export const deleteCategory = async (id: string) => {
+export const deleteCategory = async (
+  id: string,
+): Promise<axios.AxiosResponse<string | CategoryResponse>> => {
   try {
     const response = await axios.delete(`${API_URL}/category/${id}`)
-    return response
+    return response as axios.AxiosResponse<string>
   } catch (error) {
     const axiosError = error as AxiosError<UnknownResponse>
-    return axiosError.response
+    return axiosError.response as unknown as axios.AxiosResponse<CategoryResponse>
   }
 }
