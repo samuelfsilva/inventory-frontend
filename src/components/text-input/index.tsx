@@ -21,7 +21,7 @@ const TextInput: React.FC<TextInputProps> = ({
     <TextField
       label={label}
       variant="outlined"
-      size="small"
+      size="medium"
       className={styles.field}
       value={value}
       onChange={onChange}

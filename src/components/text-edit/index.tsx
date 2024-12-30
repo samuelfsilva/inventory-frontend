@@ -14,7 +14,7 @@ const TextEdit: React.FC<TextEditProps> = ({ label, value, onChange }) => {
       label={label}
       variant="outlined"
       margin="normal"
-      size="small"
+      size="medium"
       className={styles.field}
       value={value}
       onChange={onChange}

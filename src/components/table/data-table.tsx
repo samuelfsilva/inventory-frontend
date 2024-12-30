@@ -1,3 +1,6 @@
+import { Batch } from '@/types/batch'
+import { Category } from '@/types/category'
+import { Group } from '@/types/group'
 import {
   Button,
   Paper,
@@ -13,22 +16,90 @@ import styles from './data-table.module.css'
 
 interface DataTableProps {
   content: {
-    header: {
+    table: string
+    headers: {
       title: string
       size: number
     }[]
-    data: {
-      id: string
-      description: string
-      isActive: boolean
-    }[]
+    data: Category[] | Batch[] | Group[]
     handleDelete: (id: string) => void
     handleUpdate: (id: string) => void
   }
 }
 
 const DataTable: React.FC<DataTableProps> = ({ content }) => {
-  const { handleDelete, handleUpdate } = content
+  const { handleDelete, handleUpdate, headers, table, data } = content
+
+  const actionButtons = (id: string) => {
+    return (
+      <TableCell className={styles.tableAction}>
+        <Button
+          variant="contained"
+          className={styles.editButton}
+          onClick={() => handleUpdate(id)}
+        >
+          Edit
+        </Button>
+        <Button
+          variant="contained"
+          className={styles.deleteButton}
+          onClick={() => handleDelete(id)}
+        >
+          Delete
+        </Button>
+      </TableCell>
+    )
+  }
+
+  const CategoryContent = (data: Category[]) => {
+    return data
+      .sort((a, b) =>
+        a.description.localeCompare(b.description, undefined, {
+          numeric: true,
+        }),
+      )
+      .map((item) => (
+        <TableRow key={item.id} className={styles.tableRow}>
+          <TableCell>{item.description}</TableCell>
+          <TableCell>{item.isActive ? 'Active' : 'Inactive'}</TableCell>
+          {actionButtons(item.id)}
+        </TableRow>
+      ))
+  }
+
+  const BatchContent = (data: Batch[]) => {
+    return data
+      .sort((a, b) =>
+        a.description.localeCompare(b.description, undefined, {
+          numeric: true,
+        }),
+      )
+      .map((item) => (
+        <TableRow key={item.id} className={styles.tableRow}>
+          <TableCell>{item.description}</TableCell>
+          <TableCell>
+            {new Date(item.expirationDate).toLocaleDateString('en-US')}
+          </TableCell>
+          {actionButtons(item.id)}
+        </TableRow>
+      ))
+  }
+
+  const GroupContent = (data: Group[]) => {
+    return data
+      .sort((a, b) =>
+        a.description.localeCompare(b.description, undefined, {
+          numeric: true,
+        }),
+      )
+      .map((item) => (
+        <TableRow key={item.id} className={styles.tableRow}>
+          <TableCell>{item.description}</TableCell>
+          {actionButtons(item.id)}
+        </TableRow>
+      ))
+  }
+
   return (
     <React.Fragment>
       <TableContainer component={Paper} className={styles.tableContainer}>
@@ -36,12 +107,12 @@ const DataTable: React.FC<DataTableProps> = ({ content }) => {
           {/* Cabeçalho da tabela */}
           <TableHead>
             <TableRow>
-              {content.header.map((header, index) => (
+              {headers.map((item, index) => (
                 <TableCell
                   key={index}
-                  style={{ fontWeight: 'bold', width: `${header.size}%` }}
+                  style={{ fontWeight: 'bold', width: `${item.size}%` }}
                 >
-                  {header.title}
+                  {item.title}
                 </TableCell>
               ))}
               <TableCell
@@ -57,43 +128,9 @@ const DataTable: React.FC<DataTableProps> = ({ content }) => {
           </TableHead>
           {/* Corpo da tabela */}
           <TableBody>
-            {content.data
-              .sort((a, b) =>
-                a.description.localeCompare(b.description, undefined, {
-                  numeric: true,
-                }),
-              )
-              .map((category, index) => (
-                <TableRow
-                  key={category.id}
-                  style={{
-                    backgroundColor: index % 2 == 0 ? '#F8F8FF' : '#FFFFFF',
-                  }}
-                >
-                  <TableCell>{category.description}</TableCell>
-                  <TableCell>
-                    {category.isActive ? 'Active' : 'Inactive'}
-                  </TableCell>
-                  <TableCell>
-                    {/* Botões para editar e excluir */}
-                    <Button
-                      style={{ marginRight: '10px' }}
-                      variant="contained"
-                      color="primary"
-                      onClick={() => handleUpdate(category.id)}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="error"
-                      onClick={() => handleDelete(category.id)}
-                    >
-                      Delete
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
+            {table === 'category' && CategoryContent(data as Category[])}
+            {table === 'batch' && BatchContent(data as Batch[])}
+            {table === 'group' && GroupContent(data as Group[])}
           </TableBody>
         </Table>
       </TableContainer>
