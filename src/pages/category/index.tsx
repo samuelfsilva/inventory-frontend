@@ -4,8 +4,12 @@ import HamburgerMenu from '@/components/menu/hamburguer-menu'
 import links from '@/components/menu/hamburguer-menu-content'
 import DataTable from '@/components/table/data-table'
 import TextEdit from '@/components/text-edit'
-import { Category, NewCategory } from '@/types/category'
-import { CategoryReview, UnknownResponse } from '@/types/response'
+import {
+  Category,
+  CategoryResponse,
+  CategoryReview,
+  NewCategory,
+} from '@/types/category'
 import {
   deleteCategory,
   getCategories,
@@ -21,12 +25,11 @@ import {
   FormLabel,
   TextField,
 } from '@mui/material'
-import { AxiosResponse } from 'axios'
 import Head from 'next/head'
 import React, { useEffect, useState } from 'react'
 import styles from './index.module.css'
 
-const CategoriaList: React.FC = () => {
+const CategoryList: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([])
   const [putCategory, setPutCategory] = useState<NewCategory>({
     description: '',
@@ -96,9 +99,8 @@ const CategoriaList: React.FC = () => {
 
     handleCloseDeleteDialog()
 
-    const response = (await deleteCategory(deleteId)) as AxiosResponse<
-      Category | UnknownResponse
-    >
+    const response = await deleteCategory(deleteId)
+
     if (response.status === 204) {
       alert('Category deleted successfully')
     } else {
@@ -113,15 +115,10 @@ const CategoriaList: React.FC = () => {
     event.preventDefault()
     handleCloseEditDialog()
 
-    const response = (await updateCategory(
-      editId as string,
-      putCategory as NewCategory,
-    )) as AxiosResponse<Category | UnknownResponse>
+    const response = await updateCategory(editId, putCategory)
 
     if (response.status !== 200) {
-      const { error } = (await response.data) as UnknownResponse as {
-        error: CategoryReview
-      }
+      const { error } = (await response.data) as CategoryResponse
 
       if (error) {
         setEditErrors(error)
@@ -140,7 +137,8 @@ const CategoriaList: React.FC = () => {
   }
 
   const content = {
-    header: [
+    table: 'category',
+    headers: [
       { title: 'Description', size: 85 },
       { title: 'Status', size: 15 },
     ],
@@ -170,14 +168,17 @@ const CategoriaList: React.FC = () => {
         <DataTable content={content} />
         {/* Dialog to delete a category */}
         <DialogWindow
-          title="Are you sure you want to delete the category?"
+          title="Delete Category"
           openDialog={deleteOpenDialog}
           handleCloseDialog={handleCloseDeleteDialog}
           handleConfirm={handleConfirmDelete}
         >
           <DialogContent className={styles.dialogContent}>
             <WarningAmberIcon className={styles.dialogIcon} />
-            <DialogContentText>This action cannot be undone</DialogContentText>
+            <DialogContentText>
+              Are you sure you want to delete the category? <br /> This action
+              cannot be undone
+            </DialogContentText>
           </DialogContent>
         </DialogWindow>
         {/* Dialog to edit a category */}
@@ -222,4 +223,4 @@ const CategoriaList: React.FC = () => {
   )
 }
 
-export default CategoriaList
+export default CategoryList
