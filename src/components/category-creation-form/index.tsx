@@ -14,7 +14,6 @@ const CategoryCreationForm: React.FC<CategoryCreationFormProps> = ({
 }) => {
   const [newCategory, setNewCategory] = useState<NewCategory>({
     description: '',
-    isActive: true,
   })
   const [errors, setErrors] = useState<CategoryReview>({})
   const handleCreate = async (event: React.FormEvent) => {
@@ -28,7 +27,7 @@ const CategoryCreationForm: React.FC<CategoryCreationFormProps> = ({
         setErrors(error)
       } else {
         setErrors({})
-        setNewCategory({ description: '', isActive: true })
+        setNewCategory({ description: '' })
         handleUpdate?.()
       }
     }

@@ -6,7 +6,6 @@ export interface Category {
 
 export interface NewCategory {
   description: string
-  isActive: boolean
 }
 
 export interface CategoryReview {
