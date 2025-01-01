@@ -4,8 +4,8 @@ import { NewProduct, ProductResponse, ProductReview } from '@/types/product'
 import { getCategories } from '@/utils/category'
 import { getGroups } from '@/utils/group'
 import { createProduct } from '@/utils/product'
-import { Autocomplete, TextField } from '@mui/material'
-import React, { useState } from 'react'
+import { Autocomplete, Button, TextField } from '@mui/material'
+import React, { useEffect, useState } from 'react'
 import DefaultPrimaryButton from '../default-primary-button'
 import TextInput from '../text-input'
 import styles from './index.module.css'
@@ -24,9 +24,15 @@ const ProductCreationForm: React.FC<ProductCreationFormProps> = ({
     groupId: '',
   })
   const [errors, setErrors] = useState<ProductReview>({})
-
   const [categoryList, setCategoryList] = useState<Category[]>([])
   const [groupList, setGroupList] = useState<Group[]>([])
+  const [category, setCategory] = useState<Category | null>(null)
+  const [group, setGroup] = useState<Group | null>(null)
+
+  useEffect(() => {
+    fetchCategories()
+    fetchGroups()
+  }, [])
 
   const fetchCategories = async () => {
     const response = await getCategories()
@@ -38,32 +44,42 @@ const ProductCreationForm: React.FC<ProductCreationFormProps> = ({
     setGroupList(response)
   }
 
-  React.useEffect(() => {
-    fetchCategories()
-    fetchGroups()
-  }, [])
+  const resetForm = () => {
+    setErrors({})
+    setNewProduct({
+      name: '',
+      description: '',
+      categoryId: '',
+      groupId: '',
+    })
+    setCategory(null)
+    setGroup(null)
+    setErrors({})
+    handleUpdate?.()
+  }
 
   const handleCreate = async (event: React.FormEvent) => {
     event.preventDefault()
     const response = await createProduct(newProduct)
 
-    if (response.status !== 200) {
+    if (response.status !== 201) {
       const { error } = response.data as ProductResponse
 
       if (error) {
         setErrors(error)
       } else {
-        setErrors({})
-        setNewProduct({
-          name: '',
-          description: '',
-          categoryId: '',
-          groupId: '',
-        })
-        handleUpdate?.()
+        resetForm()
       }
+    } else {
+      alert('Product created successfully!')
+      resetForm()
     }
   }
+
+  const handleClearFields = () => {
+    resetForm()
+  }
+
   return (
     <form onSubmit={handleCreate}>
       <div className={styles.form}>
@@ -88,9 +104,11 @@ const ProductCreationForm: React.FC<ProductCreationFormProps> = ({
         <Autocomplete
           disablePortal
           options={categoryList}
+          value={category}
           getOptionLabel={(option) => option.description}
           onChange={(e, value) => {
             if (value) setNewProduct({ ...newProduct, categoryId: value.id })
+            if (value) setCategory(value)
           }}
           sx={{ width: 300 }}
           renderInput={(params) => <TextField {...params} label="Category" />}
@@ -98,15 +116,24 @@ const ProductCreationForm: React.FC<ProductCreationFormProps> = ({
         <Autocomplete
           disablePortal
           options={groupList}
+          value={group}
           getOptionLabel={(option) => option.description}
           onChange={(e, value) => {
             if (value) setNewProduct({ ...newProduct, groupId: value.id })
+            if (value) setGroup(value)
           }}
           sx={{ width: 300 }}
           renderInput={(params) => <TextField {...params} label="Group" />}
         />
         <div className={styles.buttonCreateContainer}>
-          <DefaultPrimaryButton text="Create" type="submit" />
+          <DefaultPrimaryButton text="Create" props={{ type: 'submit' }} />
+          <Button
+            onClick={handleClearFields}
+            color="secondary"
+            variant="contained"
+          >
+            Clear
+          </Button>
         </div>
       </div>
     </form>

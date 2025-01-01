@@ -3,15 +3,15 @@ import React from 'react'
 
 interface PrimaryDefaulButtonProps {
   text: string
-  type?: 'submit' | 'button' | 'reset'
+  props?: React.ComponentProps<typeof Button>
 }
 
 const DefaultPrimaryButton: React.FC<PrimaryDefaulButtonProps> = ({
   text,
-  type,
+  props,
 }) => {
   return (
-    <Button variant="contained" color="primary" type={type}>
+    <Button variant="contained" color="primary" {...props}>
       {text}
     </Button>
   )

@@ -5,6 +5,14 @@ export interface Product {
   isActive: boolean
   categoryId: string
   groupId: string
+  category: {
+    id: string
+    description: string
+  }
+  group: {
+    id: string
+    description: string
+  }
 }
 
 export interface NewProduct {

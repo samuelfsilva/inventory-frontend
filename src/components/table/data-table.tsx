@@ -1,6 +1,7 @@
 import { Batch } from '@/types/batch'
 import { Category } from '@/types/category'
 import { Group } from '@/types/group'
+import { Product } from '@/types/product'
 import {
   Button,
   Paper,
@@ -21,7 +22,7 @@ interface DataTableProps {
       title: string
       size: number
     }[]
-    data: Category[] | Batch[] | Group[]
+    data: Category[] | Batch[] | Group[] | Product[]
     handleDelete: (id: string) => void
     handleUpdate: (id: string) => void
   }
@@ -49,6 +50,24 @@ const DataTable: React.FC<DataTableProps> = ({ content }) => {
         </Button>
       </TableCell>
     )
+  }
+
+  const ProductContent = (data: Product[]) => {
+    return data
+      .sort((a, b) =>
+        a.name.localeCompare(b.name, undefined, {
+          numeric: true,
+        }),
+      )
+      .map((item) => (
+        <TableRow key={item.id} className={styles.tableRow}>
+          <TableCell>{item.name}</TableCell>
+          <TableCell>{item.category.description}</TableCell>
+          <TableCell>{item.group.description}</TableCell>
+          <TableCell>{item.isActive ? 'Active' : 'Inactive'}</TableCell>
+          {actionButtons(item.id)}
+        </TableRow>
+      ))
   }
 
   const CategoryContent = (data: Category[]) => {
@@ -131,6 +150,7 @@ const DataTable: React.FC<DataTableProps> = ({ content }) => {
             {table === 'category' && CategoryContent(data as Category[])}
             {table === 'batch' && BatchContent(data as Batch[])}
             {table === 'group' && GroupContent(data as Group[])}
+            {table === 'product' && ProductContent(data as Product[])}
           </TableBody>
         </Table>
       </TableContainer>

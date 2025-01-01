@@ -75,10 +75,11 @@ const ProductList: React.FC = () => {
 
   const listUpdate = async () => {
     const response = await getProducts()
+    console.log(response)
     setProducts([])
     setProducts(
       response.filter((product) =>
-        product.description.toLowerCase().includes(searchTerm.toLowerCase()),
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()),
       ),
     )
   }
@@ -105,8 +106,8 @@ const ProductList: React.FC = () => {
     setSearchTerm(event.target.value)
   }
 
-  const filteredProducts = products.filter((product) =>
-    product.description.toLowerCase().includes(searchTerm.toLowerCase()),
+  const filteredProducts: Product[] = products.filter((product) =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
   const handleCloseDeleteDialog = () => {
@@ -164,12 +165,23 @@ const ProductList: React.FC = () => {
   const content = {
     table: 'product',
     headers: [
-      { title: 'Description', size: 85 },
-      { title: 'Status', size: 15 },
+      { title: 'Description', size: 45 },
+      { title: 'Category', size: 15 },
+      { title: 'Group', size: 15 },
+      { title: 'Status', size: 10 },
     ],
     data: filteredProducts.map((product) => ({
       id: product.id,
+      name: product.name,
       description: product.description,
+      category: {
+        id: product.category.id,
+        description: product.category.description,
+      },
+      group: {
+        id: product.group.id,
+        description: product.group.description,
+      },
       isActive: product.isActive,
     })),
     handleDelete,
