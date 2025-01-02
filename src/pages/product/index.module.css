@@ -26,8 +26,24 @@
 .formLabel {
   display: flex;
   align-items: center;
+  gap: 10px;
 }
 
 .formLabelTextField {
   margin-left: 10px;
+  width: 300px;
+}
+
+.formLabelAutoComplete {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.formContent {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  gap: 20px;
 }

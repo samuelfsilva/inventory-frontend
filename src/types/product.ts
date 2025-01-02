@@ -3,8 +3,6 @@ export interface Product {
   name: string
   description: string
   isActive: boolean
-  categoryId: string
-  groupId: string
   category: {
     id: string
     description: string
@@ -20,6 +18,15 @@ export interface NewProduct {
   description: string
   categoryId: string
   groupId: string
+}
+
+export interface PutProduct {
+  id: string
+  name: string
+  description: string
+  categoryId: string
+  groupId: string
+  isActive: boolean
 }
 
 export interface ProductReview {

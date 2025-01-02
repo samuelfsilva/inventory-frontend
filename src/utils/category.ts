@@ -9,6 +9,11 @@ export const getCategories = async (): Promise<Category[]> => {
   return response.data as Category[]
 }
 
+export const getActiveCategories = async (): Promise<Category[]> => {
+  const response = await axios.get(`${API_URL}/category/active`)
+  return response.data as Category[]
+}
+
 export const getCategory = async (id: string): Promise<Category> => {
   const response = await axios.get(`${API_URL}/category/${id}`)
   return response.data as Category

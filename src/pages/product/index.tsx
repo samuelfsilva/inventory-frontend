@@ -7,12 +7,12 @@ import TextEdit from '@/components/text-edit'
 import { Category } from '@/types/category'
 import { Group } from '@/types/group'
 import {
-  NewProduct,
   Product,
   ProductResponse,
   ProductReview,
+  PutProduct,
 } from '@/types/product'
-import { getCategories } from '@/utils/category'
+import { getActiveCategories } from '@/utils/category'
 import { getGroups } from '@/utils/group'
 import {
   deleteProduct,
@@ -35,12 +35,7 @@ import styles from './index.module.css'
 
 const ProductList: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([])
-  const [putProduct, setPutProduct] = useState<NewProduct>({
-    name: '',
-    description: '',
-    categoryId: '',
-    groupId: '',
-  })
+  const [putProduct, setPutProduct] = useState<PutProduct | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [editErrors, setEditErrors] = useState<ProductReview>({})
   const [deleteOpenDialog, setDeleteOpenDialog] = useState(false)
@@ -49,6 +44,10 @@ const ProductList: React.FC = () => {
   const [editId, setEditId] = useState('')
   const [categoryList, setCategoryList] = useState<Category[]>([])
   const [groupList, setGroupList] = useState<Group[]>([])
+  const [putProductCategory, setPutProductCategory] = useState<Category | null>(
+    null,
+  )
+  const [putProductGroup, setPutProductGroup] = useState<Group | null>(null)
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -64,7 +63,7 @@ const ProductList: React.FC = () => {
   }, [])
 
   const fetchCategories = async () => {
-    const response = await getCategories()
+    const response = await getActiveCategories()
     setCategoryList(response)
   }
 
@@ -75,7 +74,6 @@ const ProductList: React.FC = () => {
 
   const listUpdate = async () => {
     const response = await getProducts()
-    console.log(response)
     setProducts([])
     setProducts(
       response.filter((product) =>
@@ -86,15 +84,37 @@ const ProductList: React.FC = () => {
 
   const handleUpdate = async (id: string) => {
     setEditId(id)
-    setEditOpenDialog(true)
+    setPutProductCategory(null)
+    setPutProductGroup(null)
+    setPutProduct(null)
 
-    const data = await getProduct(id as string)
+    const data: Product = await getProduct(id as string)
+
+    console.log(data)
+
+    if (!data) {
+      alert('Error fetching product, please try again')
+      return
+    }
+
     setPutProduct({
+      id: data.id,
       name: data.name,
       description: data.description,
-      categoryId: data.categoryId,
-      groupId: data.groupId,
+      categoryId: data.category.id,
+      groupId: data.group.id,
+      isActive: data.isActive,
     })
+
+    if (data) {
+      setPutProductCategory(
+        categoryList.find((c) => c.id === data.category.id) || null,
+      )
+
+      setPutProductGroup(groupList.find((g) => g.id === data.group.id) || null)
+    }
+
+    setEditOpenDialog(true)
   }
 
   const handleDelete = async (id: string) => {
@@ -117,6 +137,7 @@ const ProductList: React.FC = () => {
   const handleCloseEditDialog = () => {
     setEditId('')
     setEditErrors({})
+    setPutProduct(null)
     setEditOpenDialog(false)
   }
 
@@ -141,6 +162,11 @@ const ProductList: React.FC = () => {
     event.preventDefault()
     handleCloseEditDialog()
 
+    if (!putProduct) {
+      alert('Error updating product, please try again')
+      return
+    }
+
     const response = await updateProduct(editId, putProduct)
 
     if (response.status !== 200) {
@@ -149,12 +175,9 @@ const ProductList: React.FC = () => {
       if (error) {
         setEditErrors(error)
         setEditOpenDialog(true)
-      } else {
-        setEditErrors({})
-        setEditOpenDialog(false)
-        setEditId('')
       }
     } else {
+      setEditErrors({})
       setEditOpenDialog(false)
       setEditId('')
     }
@@ -221,52 +244,99 @@ const ProductList: React.FC = () => {
         {/* Dialog to edit a product */}
         <DialogWindow
           title="Edit Product"
-          openDialog={editOpenDialog}
+          openDialog={
+            editOpenDialog &&
+            !!putProduct &&
+            !!putProductCategory &&
+            !!putProductGroup
+          }
           handleCloseDialog={handleCloseEditDialog}
           handleConfirm={handleConfirmEdit}
         >
-          <FormLabel className={styles.formLabel}>
-            Description:
-            <TextField
-              className={styles.formLabelTextField}
-              type="text"
-              size="small"
-              value={putProduct.description}
-              onChange={(e) =>
-                setPutProduct({
-                  ...putProduct,
-                  description: e.target.value,
-                })
-              }
-              error={!!editErrors.description}
-              helperText={editErrors.description}
-            />
-          </FormLabel>
-          <FormLabel>
-            Category:
-            <Autocomplete
-              disablePortal
-              options={categoryList}
-              onChange={(e, value) => {
-                if (value)
-                  setPutProduct({ ...putProduct, categoryId: value.id })
-              }}
-              sx={{ width: 300 }}
-              renderInput={(params) => <TextField {...params} label="" />}
-            />
-          </FormLabel>
-          <FormLabel>
-            Group:
-            <Autocomplete
-              disablePortal
-              options={groupList}
-              onChange={(e, value) => {
-                if (value) setPutProduct({ ...putProduct, groupId: value.id })
-              }}
-              sx={{ width: 300 }}
-              renderInput={(params) => <TextField {...params} label="" />}
-            />
-          </FormLabel>
+          <div className={styles.formContent}>
+            <FormLabel className={styles.formLabel}>
+              Name:
+              <TextField
+                className={styles.formLabelTextField}
+                type="text"
+                value={putProduct ? putProduct.name : ''}
+                onChange={(e) =>
+                  setPutProduct((putProduct) =>
+                    putProduct
+                      ? {
+                          ...putProduct,
+                          name: e.target.value,
+                        }
+                      : null,
+                  )
+                }
+                error={!!editErrors.name}
+                helperText={editErrors.name}
+              />
+            </FormLabel>
+            <FormLabel className={styles.formLabel}>
+              Description:
+              <TextField
+                className={styles.formLabelTextField}
+                type="text"
+                value={putProduct ? putProduct.description : ''}
+                onChange={(e) =>
+                  setPutProduct((putProduct) =>
+                    putProduct
+                      ? {
+                          ...putProduct,
+                          description: e.target.value,
+                        }
+                      : null,
+                  )
+                }
+                error={!!editErrors.description}
+                helperText={editErrors.description}
+              />
+            </FormLabel>
+            <FormLabel className={styles.formLabelAutoComplete}>
+              Category: <br />
+              {putProductCategory?.description}
+              <Autocomplete
+                disablePortal
+                options={categoryList}
+                value={putProductCategory}
+                getOptionLabel={(option) => option.description}
+                onChange={(e, value) => {
+                  if (value)
+                    setPutProduct((putProduct) =>
+                      putProduct
+                        ? { ...putProduct, categoryId: value.id }
+                        : null,
+                    )
+                  if (value) setPutProductCategory(value)
+                }}
+                sx={{ width: 300 }}
+                renderInput={(params) => <TextField {...params} label="" />}
+              />
+            </FormLabel>
+            <FormLabel className={styles.formLabelAutoComplete}>
+              Group:
+              <Autocomplete
+                disablePortal
+                options={groupList}
+                value={putProductGroup}
+                getOptionLabel={(option) => option.description}
+                isOptionEqualToValue={(option: Group, value: Group) =>
+                  option.id === value.id
+                }
+                onChange={(e, value) => {
+                  if (value)
+                    setPutProduct((putProduct) =>
+                      putProduct ? { ...putProduct, groupId: value.id } : null,
+                    )
+                  if (value) setPutProductGroup(value)
+                }}
+                sx={{ width: 300 }}
+                renderInput={(params) => <TextField {...params} label="" />}
+              />
+            </FormLabel>
+          </div>
         </DialogWindow>
       </div>
     </div>

@@ -1,10 +1,10 @@
 import { Category } from '@/types/category'
 import { Group } from '@/types/group'
 import { NewProduct, ProductResponse, ProductReview } from '@/types/product'
-import { getCategories } from '@/utils/category'
+import { getActiveCategories } from '@/utils/category'
 import { getGroups } from '@/utils/group'
 import { createProduct } from '@/utils/product'
-import { Autocomplete, Button, TextField } from '@mui/material'
+import { Autocomplete, Button, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import DefaultPrimaryButton from '../default-primary-button'
 import TextInput from '../text-input'
@@ -35,7 +35,7 @@ const ProductCreationForm: React.FC<ProductCreationFormProps> = ({
   }, [])
 
   const fetchCategories = async () => {
-    const response = await getCategories()
+    const response = await getActiveCategories()
     setCategoryList(response)
   }
 
@@ -55,24 +55,22 @@ const ProductCreationForm: React.FC<ProductCreationFormProps> = ({
     setCategory(null)
     setGroup(null)
     setErrors({})
-    handleUpdate?.()
   }
 
   const handleCreate = async (event: React.FormEvent) => {
     event.preventDefault()
     const response = await createProduct(newProduct)
 
-    if (response.status !== 201) {
+    if (response.status !== 201 && response.status !== 200) {
       const { error } = response.data as ProductResponse
 
       if (error) {
         setErrors(error)
-      } else {
-        resetForm()
       }
     } else {
       alert('Product created successfully!')
       resetForm()
+      handleUpdate?.()
     }
   }
 
@@ -101,30 +99,44 @@ const ProductCreationForm: React.FC<ProductCreationFormProps> = ({
           error={!!errors.description}
           helperText={errors.description}
         />
-        <Autocomplete
-          disablePortal
-          options={categoryList}
-          value={category}
-          getOptionLabel={(option) => option.description}
-          onChange={(e, value) => {
-            if (value) setNewProduct({ ...newProduct, categoryId: value.id })
-            if (value) setCategory(value)
-          }}
-          sx={{ width: 300 }}
-          renderInput={(params) => <TextField {...params} label="Category" />}
-        />
-        <Autocomplete
-          disablePortal
-          options={groupList}
-          value={group}
-          getOptionLabel={(option) => option.description}
-          onChange={(e, value) => {
-            if (value) setNewProduct({ ...newProduct, groupId: value.id })
-            if (value) setGroup(value)
-          }}
-          sx={{ width: 300 }}
-          renderInput={(params) => <TextField {...params} label="Group" />}
-        />
+        <div className={styles.categoryContainer}>
+          <Autocomplete
+            disablePortal
+            options={categoryList}
+            value={category}
+            getOptionLabel={(option) => option.description}
+            onChange={(e, value) => {
+              if (value) setNewProduct({ ...newProduct, categoryId: value.id })
+              if (value) setCategory(value)
+            }}
+            className={styles.autocompleteField}
+            renderInput={(params) => <TextField {...params} label="Category" />}
+          />
+          {errors.categoryId && (
+            <Typography className={styles.errorMessage}>
+              {errors.categoryId}
+            </Typography>
+          )}
+        </div>
+        <div className={styles.groupContainer}>
+          <Autocomplete
+            disablePortal
+            options={groupList}
+            value={group}
+            getOptionLabel={(option) => option.description}
+            onChange={(e, value) => {
+              if (value) setNewProduct({ ...newProduct, groupId: value.id })
+              if (value) setGroup(value)
+            }}
+            className={styles.autocompleteField}
+            renderInput={(params) => <TextField {...params} label="Group" />}
+          />
+          {errors.groupId && (
+            <Typography className={styles.errorMessage}>
+              {errors.groupId}
+            </Typography>
+          )}
+        </div>
         <div className={styles.buttonCreateContainer}>
           <DefaultPrimaryButton text="Create" props={{ type: 'submit' }} />
           <Button
