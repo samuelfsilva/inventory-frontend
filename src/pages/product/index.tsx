@@ -23,11 +23,13 @@ import {
 import WarningAmberIcon from '@mui/icons-material/WarningAmber'
 import {
   Autocomplete,
+  Checkbox,
   DialogContent,
   DialogContentText,
   Divider,
   FormLabel,
   TextField,
+  Typography,
 } from '@mui/material'
 import Head from 'next/head'
 import React, { useEffect, useState } from 'react'
@@ -90,15 +92,12 @@ const ProductList: React.FC = () => {
 
     const data: Product = await getProduct(id as string)
 
-    console.log(data)
-
     if (!data) {
       alert('Error fetching product, please try again')
       return
     }
 
     setPutProduct({
-      id: data.id,
       name: data.name,
       description: data.description,
       categoryId: data.category.id,
@@ -255,7 +254,7 @@ const ProductList: React.FC = () => {
         >
           <div className={styles.formContent}>
             <FormLabel className={styles.formLabel}>
-              Name:
+              <Typography>Name:</Typography>
               <TextField
                 className={styles.formLabelTextField}
                 type="text"
@@ -275,7 +274,7 @@ const ProductList: React.FC = () => {
               />
             </FormLabel>
             <FormLabel className={styles.formLabel}>
-              Description:
+              <Typography>Description:</Typography>
               <TextField
                 className={styles.formLabelTextField}
                 type="text"
@@ -294,9 +293,12 @@ const ProductList: React.FC = () => {
                 helperText={editErrors.description}
               />
             </FormLabel>
-            <FormLabel className={styles.formLabelAutoComplete}>
-              Category: <br />
-              {putProductCategory?.description}
+            <FormLabel
+              className={[styles.formLabel, styles.formLabelAutoComplete].join(
+                ' ',
+              )}
+            >
+              <Typography>Category:</Typography>
               <Autocomplete
                 disablePortal
                 options={categoryList}
@@ -315,16 +317,17 @@ const ProductList: React.FC = () => {
                 renderInput={(params) => <TextField {...params} label="" />}
               />
             </FormLabel>
-            <FormLabel className={styles.formLabelAutoComplete}>
-              Group:
+            <FormLabel
+              className={[styles.formLabel, styles.formLabelAutoComplete].join(
+                ' ',
+              )}
+            >
+              <Typography>Group:</Typography>
               <Autocomplete
                 disablePortal
                 options={groupList}
                 value={putProductGroup}
                 getOptionLabel={(option) => option.description}
-                isOptionEqualToValue={(option: Group, value: Group) =>
-                  option.id === value.id
-                }
                 onChange={(e, value) => {
                   if (value)
                     setPutProduct((putProduct) =>
@@ -335,6 +338,25 @@ const ProductList: React.FC = () => {
                 sx={{ width: 300 }}
                 renderInput={(params) => <TextField {...params} label="" />}
               />
+            </FormLabel>
+            <FormLabel className={styles.formLabel}>
+              <Typography>Status:</Typography>
+              <div className={styles.statusContiner}>
+                <Checkbox
+                  className={styles.formLabelTextField}
+                  checked={putProduct ? putProduct.isActive : false}
+                  onChange={(e) =>
+                    setPutProduct((putProduct) =>
+                      putProduct
+                        ? {
+                            ...putProduct,
+                            isActive: e.target.checked,
+                          }
+                        : null,
+                    )
+                  }
+                />
+              </div>
             </FormLabel>
           </div>
         </DialogWindow>

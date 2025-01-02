@@ -8,7 +8,7 @@ import {
   Category,
   CategoryResponse,
   CategoryReview,
-  NewCategory,
+  PutCategory,
 } from '@/types/category'
 import {
   deleteCategory,
@@ -31,7 +31,7 @@ import styles from './index.module.css'
 
 const CategoryList: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([])
-  const [putCategory, setPutCategory] = useState<NewCategory>({
+  const [putCategory, setPutCategory] = useState<PutCategory>({
     description: '',
     isActive: true,
   })

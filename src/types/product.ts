@@ -21,7 +21,6 @@ export interface NewProduct {
 }
 
 export interface PutProduct {
-  id: string
   name: string
   description: string
   categoryId: string
