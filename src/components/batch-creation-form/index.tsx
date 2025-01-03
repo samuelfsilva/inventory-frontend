@@ -1,6 +1,6 @@
 import { BatchResponse, BatchReview, NewBatch } from '@/types/batch'
 import { createBatch } from '@/utils/batch'
-import { Typography } from '@mui/material'
+import { InputLabel } from '@mui/material'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
@@ -63,9 +63,9 @@ const BatchCreationForm: React.FC<BatchCreationFormProps> = ({
               }}
             />
             {errors.expirationDate && (
-              <Typography className={styles.errorExpirationDate}>
+              <InputLabel className={styles.errorExpirationDate}>
                 {errors.expirationDate}
-              </Typography>
+              </InputLabel>
             )}
           </LocalizationProvider>
         </div>

@@ -29,8 +29,14 @@
   gap: 10px;
 }
 
-.formLabel > p {
+.formLabel > label {
   width: 130px;
+}
+
+.multilineAlign {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
 }
 
 .statusContiner {
@@ -43,7 +49,6 @@
 }
 
 .formLabelTextField {
-  margin-left: 10px;
   width: 300px;
 }
 

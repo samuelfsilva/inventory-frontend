@@ -4,7 +4,7 @@ import { NewProduct, ProductResponse, ProductReview } from '@/types/product'
 import { getActiveCategories } from '@/utils/category'
 import { getGroups } from '@/utils/group'
 import { createProduct } from '@/utils/product'
-import { Autocomplete, Button, TextField, Typography } from '@mui/material'
+import { Autocomplete, Button, InputLabel, TextField } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import DefaultPrimaryButton from '../default-primary-button'
 import TextInput from '../text-input'
@@ -92,6 +92,8 @@ const ProductCreationForm: React.FC<ProductCreationFormProps> = ({
         />
         <TextInput
           label="Description"
+          multiline
+          rows={1}
           value={newProduct.description}
           onChange={(e) =>
             setNewProduct({ ...newProduct, description: e.target.value })
@@ -113,9 +115,9 @@ const ProductCreationForm: React.FC<ProductCreationFormProps> = ({
             renderInput={(params) => <TextField {...params} label="Category" />}
           />
           {errors.categoryId && (
-            <Typography className={styles.errorMessage}>
+            <InputLabel className={styles.errorMessage}>
               {errors.categoryId}
-            </Typography>
+            </InputLabel>
           )}
         </div>
         <div className={styles.groupContainer}>
@@ -132,9 +134,9 @@ const ProductCreationForm: React.FC<ProductCreationFormProps> = ({
             renderInput={(params) => <TextField {...params} label="Group" />}
           />
           {errors.groupId && (
-            <Typography className={styles.errorMessage}>
+            <InputLabel className={styles.errorMessage}>
               {errors.groupId}
-            </Typography>
+            </InputLabel>
           )}
         </div>
         <div className={styles.buttonCreateContainer}>

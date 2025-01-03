@@ -28,8 +28,8 @@ import {
   DialogContentText,
   Divider,
   FormLabel,
+  InputLabel,
   TextField,
-  Typography,
 } from '@mui/material'
 import Head from 'next/head'
 import React, { useEffect, useState } from 'react'
@@ -260,7 +260,7 @@ const ProductList: React.FC = () => {
         >
           <div className={styles.formContent}>
             <FormLabel className={styles.formLabel}>
-              <Typography>Name:</Typography>
+              <InputLabel>Name:</InputLabel>
               <TextField
                 className={styles.formLabelTextField}
                 type="text"
@@ -279,10 +279,14 @@ const ProductList: React.FC = () => {
                 helperText={editErrors.name}
               />
             </FormLabel>
-            <FormLabel className={styles.formLabel}>
-              <Typography>Description:</Typography>
+            <FormLabel
+              className={[styles.formLabel, styles.multilineAlign].join(' ')}
+            >
+              <InputLabel>Description:</InputLabel>
               <TextField
                 className={styles.formLabelTextField}
+                multiline
+                rows={4}
                 type="text"
                 value={putProduct ? putProduct.description : ''}
                 onChange={(e) =>
@@ -304,7 +308,7 @@ const ProductList: React.FC = () => {
                 ' ',
               )}
             >
-              <Typography>Category:</Typography>
+              <InputLabel>Category:</InputLabel>
               <Autocomplete
                 disablePortal
                 options={categoryList}
@@ -328,7 +332,7 @@ const ProductList: React.FC = () => {
                 ' ',
               )}
             >
-              <Typography>Group:</Typography>
+              <InputLabel>Group:</InputLabel>
               <Autocomplete
                 disablePortal
                 options={groupList}
@@ -346,7 +350,7 @@ const ProductList: React.FC = () => {
               />
             </FormLabel>
             <FormLabel className={styles.formLabel}>
-              <Typography>Status:</Typography>
+              <InputLabel>Status:</InputLabel>
               <div className={styles.statusContiner}>
                 <Checkbox
                   className={styles.formLabelTextField}

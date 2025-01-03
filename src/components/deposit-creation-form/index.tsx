@@ -55,6 +55,8 @@ const DepositCreationForm: React.FC<DepositCreationFormProps> = ({
         />
         <TextInput
           label="Description"
+          multiline
+          rows={1}
           value={newDeposit?.description || ''}
           onChange={(e) => {
             if (newDeposit)

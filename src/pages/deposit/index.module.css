@@ -30,4 +30,23 @@
 
 .formLabelTextField {
   margin-left: 10px;
+  width: 300px;
+}
+
+.multilineAlign {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+.dialogContent {
+  gap: 40px;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  margin: 0px;
+}
+
+.formLabel > label {
+  width: 100px;
 }

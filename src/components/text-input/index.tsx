@@ -8,6 +8,8 @@ interface TextInputProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   error?: boolean
   helperText?: string
+  multiline?: boolean
+  rows?: number
 }
 
 const TextInput: React.FC<TextInputProps> = ({
@@ -16,10 +18,14 @@ const TextInput: React.FC<TextInputProps> = ({
   onChange,
   error,
   helperText,
+  multiline,
+  rows,
 }) => {
   return (
     <TextField
       label={label}
+      multiline={multiline}
+      rows={rows}
       variant="outlined"
       size="medium"
       className={styles.field}

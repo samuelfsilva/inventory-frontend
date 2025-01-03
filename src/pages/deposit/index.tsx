@@ -23,6 +23,7 @@ import {
   DialogContentText,
   Divider,
   FormLabel,
+  InputLabel,
   TextField,
 } from '@mui/material'
 import Head from 'next/head'
@@ -194,55 +195,61 @@ const DepositList: React.FC = () => {
           handleCloseDialog={handleCloseEditDialog}
           handleConfirm={handleConfirmEdit}
         >
-          <FormLabel className={styles.formLabel}>
-            Name:
-            <TextField
-              className={styles.formLabelTextField}
-              type="text"
-              size="small"
-              value={putDeposit?.name || ''}
-              onChange={(e) => {
-                if (putDeposit)
-                  setPutDeposit({
-                    ...putDeposit,
-                    name: e.target.value,
-                  })
-              }}
-              error={!!editErrors.name}
-              helperText={editErrors.name}
-            />
-          </FormLabel>
-          <FormLabel className={styles.formLabel}>
-            Description:
-            <TextField
-              className={styles.formLabelTextField}
-              type="text"
-              size="small"
-              value={putDeposit?.description || ''}
-              onChange={(e) => {
-                if (putDeposit)
-                  setPutDeposit({
-                    ...putDeposit,
-                    description: e.target.value,
-                  })
-              }}
-              error={!!editErrors.description}
-              helperText={editErrors.description}
-            />
-          </FormLabel>
-          <FormLabel className={styles.formLabel}>
-            Active:
-            <Checkbox
-              checked={putDeposit?.isActive || false}
-              onChange={(e) => {
-                if (putDeposit)
-                  setPutDeposit({
-                    ...putDeposit,
-                    isActive: e.target.checked,
-                  })
-              }}
-            />
-          </FormLabel>
+          <div className={styles.dialogContent}>
+            <FormLabel className={styles.formLabel}>
+              <InputLabel>Name:</InputLabel>
+              <TextField
+                className={styles.formLabelTextField}
+                type="text"
+                size="small"
+                value={putDeposit?.name || ''}
+                onChange={(e) => {
+                  if (putDeposit)
+                    setPutDeposit({
+                      ...putDeposit,
+                      name: e.target.value,
+                    })
+                }}
+                error={!!editErrors.name}
+                helperText={editErrors.name}
+              />
+            </FormLabel>
+            <FormLabel
+              className={[styles.formLabel, styles.multilineAlign].join(' ')}
+            >
+              <InputLabel>Description:</InputLabel>
+              <TextField
+                className={styles.formLabelTextField}
+                type="text"
+                size="small"
+                multiline
+                rows={4}
+                value={putDeposit?.description || ''}
+                onChange={(e) => {
+                  if (putDeposit)
+                    setPutDeposit({
+                      ...putDeposit,
+                      description: e.target.value,
+                    })
+                }}
+                error={!!editErrors.description}
+                helperText={editErrors.description}
+              />
+            </FormLabel>
+            <FormLabel className={styles.formLabel}>
+              <InputLabel>Status:</InputLabel>
+              <Checkbox
+                checked={putDeposit?.isActive || false}
+                onChange={(e) => {
+                  if (putDeposit)
+                    setPutDeposit({
+                      ...putDeposit,
+                      isActive: e.target.checked,
+                    })
+                }}
+              />
+            </FormLabel>
+          </div>
         </DialogWindow>
       </div>
     </div>
