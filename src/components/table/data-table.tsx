@@ -1,5 +1,6 @@
 import { Batch } from '@/types/batch'
 import { Category } from '@/types/category'
+import { Deposit } from '@/types/deposit'
 import { Group } from '@/types/group'
 import { Product } from '@/types/product'
 import {
@@ -22,7 +23,7 @@ interface DataTableProps {
       title: string
       size: number
     }[]
-    data: Category[] | Batch[] | Group[] | Product[]
+    data: Category[] | Batch[] | Group[] | Product[] | Deposit[]
     handleDelete: (id: string) => void
     handleUpdate: (id: string) => void
   }
@@ -50,6 +51,22 @@ const DataTable: React.FC<DataTableProps> = ({ content }) => {
         </Button>
       </TableCell>
     )
+  }
+
+  const DepositContent = (data: Deposit[]) => {
+    return data
+      .sort((a, b) =>
+        a.name.localeCompare(b.name, undefined, {
+          numeric: true,
+        }),
+      )
+      .map((item) => (
+        <TableRow key={item.id} className={styles.tableRow}>
+          <TableCell>{item.name}</TableCell>
+          <TableCell>{item.isActive ? 'Active' : 'Inactive'}</TableCell>
+          {actionButtons(item.id)}
+        </TableRow>
+      ))
   }
 
   const ProductContent = (data: Product[]) => {
@@ -151,6 +168,7 @@ const DataTable: React.FC<DataTableProps> = ({ content }) => {
             {table === 'batch' && BatchContent(data as Batch[])}
             {table === 'group' && GroupContent(data as Group[])}
             {table === 'product' && ProductContent(data as Product[])}
+            {table === 'deposit' && DepositContent(data as Deposit[])}
           </TableBody>
         </Table>
       </TableContainer>

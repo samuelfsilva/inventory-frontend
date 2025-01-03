@@ -90,6 +90,14 @@ const ProductList: React.FC = () => {
     setPutProductGroup(null)
     setPutProduct(null)
 
+    if (categoryList.length === 0) {
+      await fetchCategories()
+    }
+
+    if (groupList.length === 0) {
+      await fetchGroups()
+    }
+
     const data: Product = await getProduct(id as string)
 
     if (!data) {
@@ -105,13 +113,11 @@ const ProductList: React.FC = () => {
       isActive: data.isActive,
     })
 
-    if (data) {
-      setPutProductCategory(
-        categoryList.find((c) => c.id === data.category.id) || null,
-      )
+    setPutProductCategory(
+      categoryList.find((c) => c.id === data.category.id) || null,
+    )
 
-      setPutProductGroup(groupList.find((g) => g.id === data.group.id) || null)
-    }
+    setPutProductGroup(groupList.find((g) => g.id === data.group.id) || null)
 
     setEditOpenDialog(true)
   }
@@ -159,7 +165,6 @@ const ProductList: React.FC = () => {
 
   const handleConfirmEdit = async (event: React.FormEvent) => {
     event.preventDefault()
-    handleCloseEditDialog()
 
     if (!putProduct) {
       alert('Error updating product, please try again')
@@ -169,11 +174,11 @@ const ProductList: React.FC = () => {
     const response = await updateProduct(editId, putProduct)
 
     if (response.status !== 200) {
-      const { error } = (await response.data) as ProductResponse
+      const { error } = response.data as ProductResponse
 
       if (error) {
         setEditErrors(error)
-        setEditOpenDialog(true)
+        return
       }
     } else {
       setEditErrors({})
@@ -182,6 +187,7 @@ const ProductList: React.FC = () => {
     }
 
     listUpdate()
+    handleCloseEditDialog()
   }
 
   const content = {
