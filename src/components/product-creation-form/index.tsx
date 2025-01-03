@@ -140,7 +140,7 @@ const ProductCreationForm: React.FC<ProductCreationFormProps> = ({
           )}
         </div>
         <div className={styles.buttonCreateContainer}>
-          <DefaultPrimaryButton text="Create" props={{ type: 'submit' }} />
+          <DefaultPrimaryButton text="Create" type="submit" />
           <Button
             onClick={handleClearFields}
             color="secondary"

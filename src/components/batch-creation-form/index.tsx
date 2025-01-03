@@ -70,7 +70,7 @@ const BatchCreationForm: React.FC<BatchCreationFormProps> = ({
           </LocalizationProvider>
         </div>
         <div className={styles.buttonCreateContainer}>
-          <DefaultPrimaryButton text="Create" props={{ type: 'submit' }} />
+          <DefaultPrimaryButton text="Create" type="submit" />
         </div>
       </div>
     </form>

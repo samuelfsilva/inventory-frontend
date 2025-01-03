@@ -45,7 +45,7 @@ const CategoryCreationForm: React.FC<CategoryCreationFormProps> = ({
           helperText={errors.description}
         />
         <div className={styles.buttonCreateContainer}>
-          <DefaultPrimaryButton text="Create" props={{ type: 'submit' }} />
+          <DefaultPrimaryButton text="Create" type="submit" />
         </div>
       </div>
     </form>
