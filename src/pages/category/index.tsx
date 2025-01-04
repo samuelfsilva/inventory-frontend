@@ -1,4 +1,5 @@
 import CategoryCreationForm from '@/components/category-creation-form'
+import CustomizedSnackBar from '@/components/customized-snackbar'
 import DialogWindow from '@/components/dialog-window'
 import HamburgerMenu from '@/components/menu/hamburguer-menu'
 import links from '@/components/menu/hamburguer-menu-content'
@@ -10,6 +11,7 @@ import {
   CategoryReview,
   PutCategory,
 } from '@/types/category'
+import { CustomizedSnackBarProps } from '@/types/snackbar'
 import {
   deleteCategory,
   getCategories,
@@ -41,6 +43,7 @@ const CategoryList: React.FC = () => {
   const [editOpenDialog, setEditOpenDialog] = useState(false)
   const [deleteId, setDeleteId] = useState('')
   const [editId, setEditId] = useState('')
+  const [snackBar, setSnackBar] = useState<CustomizedSnackBarProps | null>(null)
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -102,9 +105,21 @@ const CategoryList: React.FC = () => {
     const response = await deleteCategory(deleteId)
 
     if (response.status === 204) {
-      alert('Category deleted successfully')
+      //alert('Category deleted successfully')
+      setSnackBar((snackbar) => ({
+        ...snackbar,
+        message: 'Category deleted successfully',
+        open: true,
+        severity: 'success',
+      }))
     } else {
-      alert('Error deleting category, please try again')
+      //alert('Error deleting category, please try again')
+      setSnackBar((snackbar) => ({
+        ...snackbar,
+        message: 'Error deleting category, please try again',
+        open: true,
+        severity: 'error',
+      }))
     }
     setDeleteId('')
 
@@ -166,6 +181,11 @@ const CategoryList: React.FC = () => {
         <Divider />
         <CategoryCreationForm handleUpdate={listUpdate} />
         <DataTable content={content} />
+        <CustomizedSnackBar
+          message={snackBar?.message || ''}
+          open={snackBar?.open || false}
+          severity={snackBar?.severity}
+        />
         {/* Dialog to delete a category */}
         <DialogWindow
           title="Delete Category"

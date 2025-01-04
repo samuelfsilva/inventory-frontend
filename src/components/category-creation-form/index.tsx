@@ -1,6 +1,7 @@
 import { CategoryResponse, CategoryReview, NewCategory } from '@/types/category'
 import { createCategory } from '@/utils/category'
 import React, { useState } from 'react'
+import CustomizedSnackBar from '../customized-snackbar'
 import DefaultPrimaryButton from '../default-primary-button'
 import TextInput from '../text-input'
 import styles from './index.module.css'
@@ -20,16 +21,21 @@ const CategoryCreationForm: React.FC<CategoryCreationFormProps> = ({
     event.preventDefault()
     const response = await createCategory(newCategory)
 
-    if (response.status !== 200) {
+    if (response.status !== 200 && response.status !== 201) {
       const { error } = response.data as CategoryResponse
 
       if (error) {
         setErrors(error)
-      } else {
-        setErrors({})
-        setNewCategory({ description: '' })
-        handleUpdate?.()
       }
+    } else {
+      setErrors({})
+      setNewCategory({ description: '' })
+      CustomizedSnackBar({
+        message: 'Category created successfully',
+        open: true,
+        severity: 'success',
+      })
+      handleUpdate?.()
     }
   }
   return (
